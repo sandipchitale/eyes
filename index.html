@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>eyes</title>
+    <style>
+      html, body {
+        height: 100%;
+      }
+      body {
+        margin: 0px;
+        overflow: hidden;
+        -webkit-app-region: drag;
+      }
+      html, body svg n{
+        background-color: transparent;
+      }
+      .center {
+        margin: auto auto;
+      }
+    </style>
+    <script>
+    function load() {
+      const remote = require('electron').remote;
+      const screen = require('electron').screen;
+      const currentWindow = remote.getCurrentWindow();
+
+      const lefteye = document.querySelector('#lefteye');
+      const righteye = document.querySelector('#righteye');
+
+      let lastCp = {x: null, y: null};
+      let lastWp = [null, null];
+
+      setInterval(function() {
+        let cp = screen.getCursorScreenPoint();
+        let wp = currentWindow.getPosition();
+
+        if (cp.x === lastCp.x && cp.y === lastCp.y && wp[0] === lastWp[0] && wp[1] === lastWp[1]) {
+          return;
+        }
+
+        lastCp = cp;
+        lastWp = wp;
+
+        let deltaX = cp.x - (wp[0] + 25);
+        let deltaY = -(cp.y - (wp[1] + 25));
+        let theta = Math.atan2(deltaY, deltaX);
+
+        deltaX  = Math.cos(theta)*10;
+        deltaY  = Math.sin(theta)*10;
+        let lefteyeX  = 25 + deltaX;
+        let lefteyeY  = 25 - deltaY;
+
+        deltaX = cp.x - (wp[0] + 75);
+        deltaY = -(cp.y - (wp[1] + 25));
+        theta = Math.atan2(deltaY, deltaX);
+
+        deltaX  = Math.cos(theta)*10;
+        deltaY  = Math.sin(theta)*10;
+        let righteyeX = 75 + deltaX;
+        let righteyeY = 25 - deltaY;
+
+        lefteye.setAttribute ('cx', lefteyeX);
+        lefteye.setAttribute ('cy', lefteyeY);
+        righteye.setAttribute('cx', righteyeX);
+        righteye.setAttribute('cy', righteyeY);
+      }, 200);
+    }
+    window.onload = load;
+    </script>
+  </head>
+  <body>
+    <svg width="100" height="50">
+      <circle               cx="25" cy="25" r="20" stroke="black" stroke-width="4" fill="white" />
+      <circle id="lefteye"  cx="25" cy="25" r="4" stroke-width="0" fill="black" />
+      <circle               cx="75" cy="25" r="20" stroke="black" stroke-width="4" fill="white" />
+      <circle id="righteye" cx="75" cy="25" r="4" stroke-width="0" fill="black" />
+    </svg>
+  </body>
+</html>
